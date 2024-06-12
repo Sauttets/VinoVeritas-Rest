@@ -11,7 +11,7 @@ import (
 )
 
 func AddFitsTo(c *gin.Context) {
-	name := c.Param("name")
+	name := c.Query("fit_id")
 
 	db, err := sql.Open("sqlite3", "./wine.db")
 	if err != nil {
@@ -38,22 +38,22 @@ func AddFitsTo(c *gin.Context) {
 }
 
 func SetWineFitsTo(c *gin.Context) {
-	wineID, err := strconv.Atoi(c.Param("wine_id"))
+	wineID, err := strconv.Atoi(c.Query("wine_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid wine_id"})
 		return
 	}
-	fitsTo1, err := strconv.Atoi(c.Param("fitsTo1"))
+	fitsTo1, err := strconv.Atoi(c.Query("fitsTo1"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid fitsTo1"})
 		return
 	}
-	fitsTo2, err := strconv.Atoi(c.Param("fitsTo2"))
+	fitsTo2, err := strconv.Atoi(c.Query("fitsTo2"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid fitsTo2"})
 		return
 	}
-	fitsTo3, err := strconv.Atoi(c.Param("fitsTo3"))
+	fitsTo3, err := strconv.Atoi(c.Query("fitsTo3"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid fitsTo3"})
 		return

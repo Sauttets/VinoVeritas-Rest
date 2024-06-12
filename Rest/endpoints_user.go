@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func NewUser(c *gin.Context) {
-	username := c.Param("username")
+	username := c.Query("username")
 
 	db, err := sql.Open("sqlite3", "./wine.db")
 	if err != nil {
@@ -36,8 +37,12 @@ func NewUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	username := c.Param("username")
-	id := c.Param("id")
+	username := c.Query("username")
+	id, err := strconv.Atoi(c.Query("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
 
 	db, err := sql.Open("sqlite3", "./wine.db")
 	if err != nil {

@@ -7,10 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func setWineSupermarket(c *gin.Context) {
-
-}
-
 func authRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const BearerSchema = "Bearer "

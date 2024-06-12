@@ -8,25 +8,26 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func AddWine(c *gin.Context) {
-	name := c.Param("name")
-	year, err := strconv.Atoi(c.Param("year"))
+	name := c.Query("name")
+	year, err := strconv.Atoi(c.Query("year"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid year"})
 		return
 	}
-	country := c.Param("country")
-	wineType := c.Param("type")
-	description := c.Param("description")
-	imageURL := c.Param("imageURL")
-	volume, err := strconv.ParseFloat(c.Param("volume"), 64)
+	country := c.Query("country")
+	wineType := c.Query("type")
+	description := c.Query("description")
+	imageURL := c.Query("imageURL")
+	volume, err := strconv.ParseFloat(c.Query("volume"), 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volume"})
 		return
 	}
-	volAlc, err := strconv.ParseFloat(c.Param("volAlc"), 64)
+	volAlc, err := strconv.ParseFloat(c.Query("volAlc"), 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volAlc"})
 		return
@@ -41,11 +42,17 @@ func AddWine(c *gin.Context) {
 	// Insert new wine entry
 	query := `INSERT INTO Wine (name, year, country, type, description, imageURL, volume, volAlc) 
 	          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	_, err = db.Exec(query, name, year, country, wineType, description, imageURL, volume, volAlc)
+	result, err := db.Exec(query, name, year, country, wineType, description, imageURL, volume, volAlc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to add wine: %v", err)})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Wine added successfully!"})
+	id, err := result.LastInsertId()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve last insert ID: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Wine added successfully!", "id": id})
 }

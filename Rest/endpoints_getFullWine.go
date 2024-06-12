@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,8 +34,11 @@ type Supermarket struct {
 }
 
 func GetFullWine(c *gin.Context) {
-	id := c.Param("id")
-
+	id, err := strconv.Atoi(c.Query("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid wine ID"})
+		return
+	}
 	db, err := sql.Open("sqlite3", "./wine.db")
 	if err != nil {
 		log.Fatal(err)

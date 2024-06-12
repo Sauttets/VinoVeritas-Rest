@@ -11,12 +11,12 @@ import (
 )
 
 func AddToFavList(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("user_id"))
+	userID, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
 		return
 	}
-	wineID, err := strconv.Atoi(c.Param("wine_id"))
+	wineID, err := strconv.Atoi(c.Query("wine_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid wine_id"})
 		return
@@ -40,12 +40,12 @@ func AddToFavList(c *gin.Context) {
 }
 
 func DeleteFromFavList(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("user_id"))
+	userID, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
 		return
 	}
-	wineID, err := strconv.Atoi(c.Param("wine_id"))
+	wineID, err := strconv.Atoi(c.Query("wine_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid wine_id"})
 		return
@@ -69,7 +69,7 @@ func DeleteFromFavList(c *gin.Context) {
 }
 
 func GetFavList(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("user_id"))
+	userID, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
 		return

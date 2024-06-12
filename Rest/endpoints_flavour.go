@@ -11,7 +11,7 @@ import (
 )
 
 func AddFlavour(c *gin.Context) {
-	name := c.Param("name")
+	name := c.Query("flavour")
 
 	db, err := sql.Open("sqlite3", "./wine.db")
 	if err != nil {
@@ -38,22 +38,22 @@ func AddFlavour(c *gin.Context) {
 }
 
 func SetWineFlavour(c *gin.Context) {
-	wineID, err := strconv.Atoi(c.Param("wine_id"))
+	wineID, err := strconv.Atoi(c.Query("wine_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid wine_id"})
 		return
 	}
-	flavour1, err := strconv.Atoi(c.Param("flavour1"))
+	flavour1, err := strconv.Atoi(c.Query("flavour1"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid flavour1"})
 		return
 	}
-	flavour2, err := strconv.Atoi(c.Param("flavour2"))
+	flavour2, err := strconv.Atoi(c.Query("flavour2"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid flavour2"})
 		return
 	}
-	flavour3, err := strconv.Atoi(c.Param("flavour3"))
+	flavour3, err := strconv.Atoi(c.Query("flavour3"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid flavour3"})
 		return

@@ -27,7 +27,7 @@ func SetupDB() {
             imageURL VARCHAR(255) NOT NULL,
             volume DECIMAL(10, 2) NOT NULL,
             volAlc DECIMAL(4, 2) NOT NULL,
-			UNIQUE (name, year, volume, country)
+            UNIQUE (name, year, volume, country)
         );`,
 		"Flavour": `CREATE TABLE IF NOT EXISTS Flavour(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,7 +73,7 @@ func SetupDB() {
             house_number VARCHAR(10) NOT NULL
         );`,
 		"WineSupermarkets": `CREATE TABLE IF NOT EXISTS WineSupermarkets(
-            id INTEGER PRIMARY KEY AUTO_INCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             wine_id INTEGER NOT NULL,
             supermarket_id INTEGER NOT NULL,
             price DECIMAL(10, 2) NOT NULL,
@@ -81,13 +81,9 @@ func SetupDB() {
             FOREIGN KEY (supermarket_id) REFERENCES Supermarkets(id),
             UNIQUE (wine_id, supermarket_id)
         );`,
-		"WineFactOTD": `CREATE TABLE IF NOT EXISTS WineFactOTD(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fact TEXT NOT NULL
-        );`,
 		"Users": `CREATE TABLE IF NOT EXISTS Users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username VARCHAR(255) NOT NULL UNIQUE
+            username VARCHAR(255) NOT NULL
         );`,
 	}
 
