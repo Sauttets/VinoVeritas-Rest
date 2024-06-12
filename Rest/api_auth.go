@@ -7,23 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func addWineOTD(c *gin.Context) {
-
-}
-
-func addWineFactOTD(c *gin.Context) {
-
-}
-
-func updateWineFact(c *gin.Context, id string) {
-
-}
-
-func addSupermarket(c *gin.Context) {
-
-}
-
-func updateSupermarket(c *gin.Context, id string) {
+func setWineSupermarket(c *gin.Context) {
 
 }
 

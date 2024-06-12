@@ -1,4 +1,3 @@
--- @block
 CREATE TABLE IF NOT EXISTS Wine(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -22,19 +21,25 @@ CREATE TABLE IF NOT EXISTS FitsTo(
 );
 
 CREATE TABLE IF NOT EXISTS Wine_Flavour(
-    wine_id INTEGER,
-    flavour_id INTEGER,
-    PRIMARY KEY (wine_id, flavour_id),
-    FOREIGN KEY (wine_id) REFERENCES Wine(id) ON DELETE CASCADE,
-    FOREIGN KEY (flavour_id) REFERENCES Flavour(id) ON DELETE CASCADE
+    wine_id INTEGER PRIMARY KEY,
+    flavour_id_1 INTEGER,
+    flavour_id_2 INTEGER,
+    flavour_id_3 INTEGER,
+    FOREIGN KEY (flavour_id_1) REFERENCES Flavour(id) ON DELETE SET NULL,
+    FOREIGN KEY (flavour_id_2) REFERENCES Flavour(id) ON DELETE SET NULL,
+    FOREIGN KEY (flavour_id_3) REFERENCES Flavour(id) ON DELETE SET NULL,
+    FOREIGN KEY (wine_id) REFERENCES Wine(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Wine_FitsTo(
-    wine_id INTEGER,
-    fitsTo_id INTEGER,
-    PRIMARY KEY (wine_id, fitsTo_id),
-    FOREIGN KEY (wine_id) REFERENCES Wine(id) ON DELETE CASCADE,
-    FOREIGN KEY (fitsTo_id) REFERENCES FitsTo(id) ON DELETE CASCADE
+    wine_id INTEGER PRIMARY KEY,
+    fitsTo_id_1 INTEGER,
+    fitsTo_id_2 INTEGER,
+    fitsTo_id_3 INTEGER,
+    FOREIGN KEY (fitsTo_id_1) REFERENCES FitsTo(id) ON DELETE SET NULL,
+    FOREIGN KEY (fitsTo_id_2) REFERENCES FitsTo(id) ON DELETE SET NULL,
+    FOREIGN KEY (fitsTo_id_3) REFERENCES FitsTo(id) ON DELETE SET NULL,
+    FOREIGN KEY (wine_id) REFERENCES Wine(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS FavoriteWines(
@@ -58,6 +63,7 @@ CREATE TABLE IF NOT EXISTS WineSupermarkets(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     wine_id INTEGER NOT NULL,
     supermarket_id INTEGER NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (wine_id) REFERENCES Wine(id),
     FOREIGN KEY (supermarket_id) REFERENCES Supermarkets(id),
     UNIQUE (wine_id, supermarket_id)
@@ -67,16 +73,6 @@ CREATE TABLE IF NOT EXISTS WineFactOTD(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     fact TEXT NOT NULL
 );
--- @block
-SET FOREIGN_KEY_CHECKS = 0;
-
-DROP TABLE IF EXISTS FavoriteWines;
-DROP TABLE IF EXISTS WineSupermarkets;
-DROP TABLE IF EXISTS Wine;
-DROP TABLE IF EXISTS Supermarkets;
-DROP TABLE IF EXISTS WineFactOTD;
-
-SET FOREIGN_KEY_CHECKS = 1;
 
 
 -- @block
