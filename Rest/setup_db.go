@@ -32,10 +32,12 @@ func SetupDB() {
 		"Flavour": `CREATE TABLE IF NOT EXISTS Flavour(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL
+            UNIQUE (name)
         );`,
 		"FitsTo": `CREATE TABLE IF NOT EXISTS FitsTo(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             description VARCHAR(255) NOT NULL
+            UNIQUE (description)
         );`,
 		"Wine_Flavour": `CREATE TABLE IF NOT EXISTS Wine_Flavour(
             wine_id INTEGER PRIMARY KEY,

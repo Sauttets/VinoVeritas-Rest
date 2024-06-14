@@ -17,9 +17,9 @@ func main() {
 	//user_id
 	router.GET("/getFavList", GetFavList)
 	//user_id & username & wine_id
-	router.POST("/updateFavList", AddToFavList)
+	router.POST("/AddToFavList", AddToFavList)
 	//user_id & username & wine_id
-	router.POST("/deleteFavList", DeleteFromFavList)
+	router.POST("/deleteFromFavList", DeleteFromFavList)
 
 	//username
 	router.POST("/newUser", NewUser)
@@ -44,5 +44,17 @@ func main() {
 	//id & supermarket_id & price
 	router.POST("/setWineSupermarket", authRequired(), setWineSupermarket)
 
+	router.GET("/filterWine", FilterWine)
+
 	router.Run("localhost:8083")
 }
+
+/*
+
+export CC=x86_64-unknown-linux-gnu-gcc
+CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -o VinoVeritasRest
+
+unset CC;unset GOARCH;unset GOOS;unset CGO_ENABLED
+
+
+*/

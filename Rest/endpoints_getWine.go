@@ -12,9 +12,11 @@ import (
 
 // Wine represents the wine data structure
 type Wine struct {
+	ID            int             `json:"id"`
 	Name          string          `json:"name"`
 	Year          int             `json:"year"`
 	Volume        float64         `json:"volume"`
+	ImageURL      sql.NullString  `json:"imageURL"`
 	CheapestPrice sql.NullFloat64 `json:"cheapestPrice"`
 }
 
@@ -44,13 +46,13 @@ func GetWine(c *gin.Context) {
 
 	var wine Wine
 	query := `
-		SELECT Wine.name, Wine.year, Wine.volume, MIN(WineSupermarkets.price) as cheapestPrice
+		SELECT Wine.id, Wine.name, Wine.year, Wine.volume, Wine.imageURL, MIN(WineSupermarkets.price) as cheapestPrice
 		FROM Wine
 		LEFT JOIN WineSupermarkets ON Wine.id = WineSupermarkets.wine_id
 		WHERE Wine.id = ?
-		GROUP BY Wine.id, Wine.name, Wine.year, Wine.volume`
+		GROUP BY Wine.id, Wine.name, Wine.year, Wine.volume, Wine.imageURL`
 	row := db.QueryRow(query, id)
-	err = row.Scan(&wine.Name, &wine.Year, &wine.Volume, &wine.CheapestPrice)
+	err = row.Scan(&wine.ID, &wine.Name, &wine.Year, &wine.Volume, &wine.ImageURL, &wine.CheapestPrice)
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Wine not found"})
@@ -61,9 +63,16 @@ func GetWine(c *gin.Context) {
 	}
 
 	response := gin.H{
+		"id":     wine.ID,
 		"name":   wine.Name,
 		"year":   wine.Year,
 		"volume": wine.Volume,
+	}
+
+	if wine.ImageURL.Valid {
+		response["imageURL"] = wine.ImageURL.String
+	} else {
+		response["imageURL"] = nil
 	}
 
 	if wine.CheapestPrice.Valid {
