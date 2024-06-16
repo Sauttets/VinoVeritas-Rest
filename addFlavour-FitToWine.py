@@ -4,7 +4,7 @@ import urllib.parse
 
 token = "token"
 headers = {
-    "Authorization": f"Bearer {bullshit}"
+    "Authorization": f"Bearer {token}"
 }
 
 set_wine_flavour_url = "http://localhost:8083/setWineFlavour"
