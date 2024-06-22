@@ -32,6 +32,21 @@ func AddWine(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volAlc"})
 		return
 	}
+	dryness, err := strconv.ParseFloat(c.Query("dryness"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid dryness"})
+		return
+	}
+	acidity, err := strconv.ParseFloat(c.Query("acidity"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid acidity"})
+		return
+	}
+	tanninLevel, err := strconv.ParseFloat(c.Query("tanninLevel"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tanninLevel"})
+		return
+	}
 
 	db, err := sql.Open("sqlite3", "./wine.db")
 	if err != nil {
@@ -40,9 +55,9 @@ func AddWine(c *gin.Context) {
 	defer db.Close()
 
 	// Insert new wine entry
-	query := `INSERT INTO Wine (name, year, country, type, description, imageURL, volume, volAlc) 
-	          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	result, err := db.Exec(query, name, year, country, wineType, description, imageURL, volume, volAlc)
+	query := `INSERT INTO Wine (name, year, country, type, description, imageURL, volume, volAlc, dryness, acidity, tanninLevel) 
+	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	result, err := db.Exec(query, name, year, country, wineType, description, imageURL, volume, volAlc, dryness, acidity, tanninLevel)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to add wine: %v", err)})
 		return

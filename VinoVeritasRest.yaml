@@ -1,0 +1,325 @@
+openapi: 3.0.1
+info:
+  title: Wine API
+  version: 1.0.0
+paths:
+  /getFullWine:
+    get:
+      summary: Get full wine details
+      description: Retrieve detailed information about a wine, including its properties, flavors, fits, and supermarkets where it can be purchased.
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the wine to retrieve
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: ID of the user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullWine'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Wine not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /getWineFactOTD:
+    get:
+      summary: Get wine fact of the day
+      description: Retrieve a random wine fact based on the day of the month.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fact:
+                    type: string
+  /getFavList:
+    get:
+      summary: Get favorite wine list
+      description: Retrieve the list of favorite wines for a user.
+      parameters:
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: ID of the user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  favorite_wines:
+                    type: array
+                    items:
+                      type: integer
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /AddToFavList:
+    post:
+      summary: Add wine to favorite list
+      description: Add a wine to the user's favorite list.
+      parameters:
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: ID of the user
+        - in: query
+          name: wine_id
+          required: true
+          schema:
+            type: integer
+          description: ID of the wine
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /deleteFromFavList:
+    post:
+      summary: Delete wine from favorite list
+      description: Remove a wine from the user's favorite list.
+      parameters:
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: ID of the user
+        - in: query
+          name: wine_id
+          required: true
+          schema:
+            type: integer
+          description: ID of the wine
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /filterWine:
+    get:
+      summary: Filter wines
+      description: Retrieve a list of wines based on various filter criteria such as color, fit, flavor, and price.
+      parameters:
+        - in: query
+          name: color
+          required: false
+          schema:
+            type: string
+          description: Color/type of the wine (e.g., red, white, rose)
+        - in: query
+          name: fit
+          required: false
+          schema:
+            type: string
+          description: Fit description (e.g., desserts, fish, lamb)
+        - in: query
+          name: flavour
+          required: false
+          schema:
+            type: string
+          description: Flavour description (e.g., nutty, woody, spicy)
+        - in: query
+          name: price
+          required: false
+          schema:
+            type: string
+          description: Price sorting order (1 for descending, 0 or omitted for ascending)
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: ID of the user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FullWine'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+components:
+  schemas:
+    FullWine:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        year:
+          type: integer
+        country:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        imageURL:
+          type: string
+        volume:
+          type: number
+          format: float
+        volAlc:
+          type: number
+          format: float
+        isLiked:
+          type: boolean
+        dryness:
+          type: number
+          format: float
+        acidity:
+          type: number
+          format: float
+        tanninLevel:
+          type: number
+          format: float
+        flavours:
+          type: array
+          items:
+            type: string
+        fitsTo:
+          type: array
+          items:
+            type: string
+        supermarkets:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              street:
+                type: string
+              postal_code:
+                type: string
+              city:
+                type: string
+              house_number:
+                type: string
+              price:
+                type: number
+                format: float

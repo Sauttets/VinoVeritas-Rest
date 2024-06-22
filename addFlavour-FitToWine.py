@@ -42,7 +42,7 @@ def set_wine_fits(wine_id, fit_ids):
 
 # Adding flavours and fits to wines
 for wine_id in range(1, 251):  # Assuming wine IDs are from 1 to 250
-    flavour_ids = random.sample(range(1, 13), 3)  # Select 3 random flavours from 1 to 12
-    fit_ids = random.sample(range(1, 13), 3)  # Select 3 random fits from 1 to 12
+    flavour_ids = random.sample(range(1, 11), 3)  # Select 3 random flavours from 1 to 12
+    fit_ids = random.sample(range(1, 11), 3)  # Select 3 random fits from 1 to 12
     set_wine_flavours(wine_id, flavour_ids)
     set_wine_fits(wine_id, fit_ids)

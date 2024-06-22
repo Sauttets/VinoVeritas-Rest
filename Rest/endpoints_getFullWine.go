@@ -19,6 +19,10 @@ type FullWine struct {
 	ImageURL     string        `json:"imageURL"`
 	Volume       float64       `json:"volume"`
 	VolAlc       float64       `json:"volAlc"`
+	IsLiked      bool          `json:"isLiked"`
+	Dryness      float64       `json:"dryness"`
+	Acidity      float64       `json:"acidity"`
+	TanninLevel  float64       `json:"tanninLevel"`
 	Flavours     []string      `json:"flavours"`
 	FitsTo       []string      `json:"fitsTo"`
 	Supermarkets []Supermarket `json:"supermarkets"`
@@ -34,11 +38,18 @@ type Supermarket struct {
 }
 
 func GetFullWine(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
+	wineID, err := strconv.Atoi(c.Query("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid wine ID"})
 		return
 	}
+
+	userID, err := strconv.Atoi(c.Query("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
 	db, err := sql.Open("sqlite3", "./wine.db")
 	if err != nil {
 		log.Fatal(err)
@@ -48,10 +59,10 @@ func GetFullWine(c *gin.Context) {
 	// Fetch the basic wine information
 	var wine FullWine
 	query := `
-	SELECT id, name, year, country, type, description, imageURL, volume, volAlc
+	SELECT id, name, year, country, type, description, imageURL, volume, volAlc, dryness, acidity, tanninLevel
 	FROM Wine
 	WHERE id = ?`
-	err = db.QueryRow(query, id).Scan(&wine.ID, &wine.Name, &wine.Year, &wine.Country, &wine.Type, &wine.Description, &wine.ImageURL, &wine.Volume, &wine.VolAlc)
+	err = db.QueryRow(query, wineID).Scan(&wine.ID, &wine.Name, &wine.Year, &wine.Country, &wine.Type, &wine.Description, &wine.ImageURL, &wine.Volume, &wine.VolAlc, &wine.Dryness, &wine.Acidity, &wine.TanninLevel)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Wine not found"})
@@ -60,6 +71,16 @@ func GetFullWine(c *gin.Context) {
 		}
 		return
 	}
+
+	// Check if the wine is in the user's favorite list
+	favoriteQuery := `SELECT COUNT(1) FROM FavoriteWines WHERE user_id = ? AND wine_id = ?`
+	var count int
+	err = db.QueryRow(favoriteQuery, userID, wineID).Scan(&count)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	wine.IsLiked = count > 0
 
 	// Fetch the flavours of the wine
 	flavoursQuery := `
@@ -70,7 +91,7 @@ func GetFullWine(c *gin.Context) {
 	LEFT JOIN Flavour f3 ON Wine_Flavour.flavour_id_3 = f3.id
 	WHERE Wine_Flavour.wine_id = ?`
 	var flavour1, flavour2, flavour3 sql.NullString
-	err = db.QueryRow(flavoursQuery, id).Scan(&flavour1, &flavour2, &flavour3)
+	err = db.QueryRow(flavoursQuery, wineID).Scan(&flavour1, &flavour2, &flavour3)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -94,7 +115,7 @@ func GetFullWine(c *gin.Context) {
 	LEFT JOIN FitsTo ft3 ON Wine_FitsTo.fitsTo_id_3 = ft3.id
 	WHERE Wine_FitsTo.wine_id = ?`
 	var fitsTo1, fitsTo2, fitsTo3 sql.NullString
-	err = db.QueryRow(fitsToQuery, id).Scan(&fitsTo1, &fitsTo2, &fitsTo3)
+	err = db.QueryRow(fitsToQuery, wineID).Scan(&fitsTo1, &fitsTo2, &fitsTo3)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -115,7 +136,7 @@ func GetFullWine(c *gin.Context) {
 	FROM WineSupermarkets
 	JOIN Supermarkets ON WineSupermarkets.supermarket_id = Supermarkets.id
 	WHERE WineSupermarkets.wine_id = ?`
-	rows, err := db.Query(supermarketsQuery, id)
+	rows, err := db.Query(supermarketsQuery, wineID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

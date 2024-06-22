@@ -43,7 +43,7 @@ def add_wine_to_supermarket(wine_id, supermarket_id, price):
         print(f"Error: {response.text}")
 
 # Adding wines to up to 3 supermarkets
-for wine_id in range(1, 300):  # Assuming wine IDs are from 1 to 100
+for wine_id in range(1, 210):  # Assuming wine IDs are from 1 to 100
     if wine_exists(wine_id):
         supermarket_ids = random.sample(range(1, 12), k=random.randint(1, 3))  # Select 1 to 3 random supermarkets
         for supermarket_id in supermarket_ids:

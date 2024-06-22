@@ -8,7 +8,6 @@ import (
 )
 
 func SetupDB() {
-	// Open the SQLite database file
 	db, err := sql.Open("sqlite3", "./wine.db")
 	if err != nil {
 		log.Fatal(err)
@@ -27,16 +26,19 @@ func SetupDB() {
             imageURL VARCHAR(255) NOT NULL,
             volume DECIMAL(10, 2) NOT NULL,
             volAlc DECIMAL(4, 2) NOT NULL,
+            dryness DECIMAL(3, 2) NOT NULL,
+            acidity DECIMAL(3, 2) NOT NULL,
+            tanninLevel DECIMAL(3, 2) NOT NULL,
             UNIQUE (name, year, volume, country)
         );`,
 		"Flavour": `CREATE TABLE IF NOT EXISTS Flavour(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name VARCHAR(255) NOT NULL
+            name VARCHAR(255) NOT NULL,
             UNIQUE (name)
         );`,
 		"FitsTo": `CREATE TABLE IF NOT EXISTS FitsTo(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            description VARCHAR(255) NOT NULL
+            description VARCHAR(255) NOT NULL,
             UNIQUE (description)
         );`,
 		"Wine_Flavour": `CREATE TABLE IF NOT EXISTS Wine_Flavour(

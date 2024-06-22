@@ -6,8 +6,8 @@ headers = {
     "Authorization": f"Bearer {token}"
 }
 
-flavours = ["leather", "berry", "cherry", "oak", "vanilla", "citrus", "apple", "peach", "tropical", "spice", "honey", "smoke"]
-fits_to = ["pork", "beef", "chicken", "fish", "cheese", "pasta", "salad", "seafood", "dessert", "vegetables", "spicy food", "barbecue"]
+flavours = ["Fruchtig", "Blumig", "Erdig", "Kräutrig", "Gewürzig", "Holzig", "Nussig", "Buttrig", "Süß", "Mineralisch"]
+fits_to = ["Käse", "Fisch", "Rindfleisch", "Geflügel", "Schokolade", "Pasta", "Meeresfrüchte", "Lamm", "Desserts", "Vegetarisch"]
 
 flavour_url = "http://localhost:8083/addFlavour"
 fits_to_url = "http://localhost:8083/addFitsTo"

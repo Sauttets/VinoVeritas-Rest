@@ -16,9 +16,7 @@ func main() {
 
 	//user_id
 	router.GET("/getFavList", GetFavList)
-	//user_id & username & wine_id
 	router.POST("/AddToFavList", AddToFavList)
-	//user_id & username & wine_id
 	router.POST("/deleteFromFavList", DeleteFromFavList)
 
 	//username
