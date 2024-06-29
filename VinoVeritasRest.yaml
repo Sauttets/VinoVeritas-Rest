@@ -1,325 +1,514 @@
-openapi: 3.0.1
+swagger: '2.0'
 info:
-  title: Wine API
+  description: Wine API
   version: 1.0.0
+  title: Wine API
+host: api.gargelkarg.com
+basePath: /
+schemes:
+  - http
 paths:
+  /getWine:
+    get:
+      summary: Get wine by ID
+      parameters:
+        - name: id
+          in: query
+          description: ID of the wine
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Wine object
+          schema:
+            $ref: '#/definitions/Wine'
+        400:
+          description: Invalid ID
+        404:
+          description: Wine not found
   /getFullWine:
     get:
       summary: Get full wine details
-      description: Retrieve detailed information about a wine, including its properties, flavors, fits, and supermarkets where it can be purchased.
       parameters:
-        - in: query
-          name: id
+        - name: id
+          in: query
+          description: ID of the wine
+          required: false
+          type: integer
+        - name: range
+          in: query
+          description: Range of IDs
+          required: false
+          type: string
+        - name: user_id
+          in: query
+          description: User ID
           required: true
-          schema:
-            type: integer
-          description: ID of the wine to retrieve
-        - in: query
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: ID of the user
+          type: integer
       responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FullWine'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-        '404':
+        200:
+          description: Full wine details
+          schema:
+            $ref: '#/definitions/FullWine'
+        400:
+          description: Invalid parameters
+        404:
           description: Wine not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
   /getWineFactOTD:
     get:
       summary: Get wine fact of the day
-      description: Retrieve a random wine fact based on the day of the month.
       responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  fact:
-                    type: string
+        200:
+          description: Wine fact
+          schema:
+            type: object
+            properties:
+              fact:
+                type: string
   /getFavList:
     get:
-      summary: Get favorite wine list
-      description: Retrieve the list of favorite wines for a user.
+      summary: Get favorite wines for a user
       parameters:
-        - in: query
-          name: user_id
+        - name: user_id
+          in: query
+          description: User ID
           required: true
-          schema:
-            type: integer
-          description: ID of the user
+          type: integer
       responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  favorite_wines:
-                    type: array
-                    items:
-                      type: integer
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-  /AddToFavList:
-    post:
-      summary: Add wine to favorite list
-      description: Add a wine to the user's favorite list.
-      parameters:
-        - in: query
-          name: user_id
-          required: true
+        200:
+          description: Favorite wines
           schema:
-            type: integer
-          description: ID of the user
-        - in: query
-          name: wine_id
-          required: true
-          schema:
-            type: integer
-          description: ID of the wine
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-  /deleteFromFavList:
-    post:
-      summary: Delete wine from favorite list
-      description: Remove a wine from the user's favorite list.
-      parameters:
-        - in: query
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: ID of the user
-        - in: query
-          name: wine_id
-          required: true
-          schema:
-            type: integer
-          description: ID of the wine
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+            type: array
+            items:
+              $ref: '#/definitions/FullWine'
+        400:
+          description: Invalid user ID
   /filterWine:
     get:
       summary: Filter wines
-      description: Retrieve a list of wines based on various filter criteria such as color, fit, flavor, and price.
       parameters:
-        - in: query
-          name: color
+        - name: color
+          in: query
+          description: Wine color
           required: false
-          schema:
-            type: string
-          description: Color/type of the wine (e.g., red, white, rose)
-        - in: query
-          name: fit
+          type: string
+        - name: fit
+          in: query
+          description: Fit description
           required: false
-          schema:
-            type: string
-          description: Fit description (e.g., desserts, fish, lamb)
-        - in: query
-          name: flavour
+          type: string
+        - name: flavour
+          in: query
+          description: Flavour name
           required: false
-          schema:
-            type: string
-          description: Flavour description (e.g., nutty, woody, spicy)
-        - in: query
-          name: price
+          type: string
+        - name: price
+          in: query
+          description: Price sort order
           required: false
-          schema:
-            type: string
-          description: Price sorting order (1 for descending, 0 or omitted for ascending)
-        - in: query
-          name: user_id
+          type: string
+        - name: user_id
+          in: query
+          description: User ID
           required: true
-          schema:
-            type: integer
-          description: ID of the user
+          type: integer
       responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FullWine'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-components:
-  schemas:
-    FullWine:
-      type: object
-      properties:
-        id:
+        200:
+          description: Filtered wines
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/FullWine'
+        400:
+          description: Invalid parameters
+  /AddToFavList:
+    post:
+      summary: Add wine to favorite list
+      parameters:
+        - name: user_id
+          in: query
+          description: User ID
+          required: true
           type: integer
-        name:
-          type: string
-        year:
+        - name: wine_id
+          in: query
+          description: Wine ID
+          required: true
           type: integer
-        country:
+      responses:
+        200:
+          description: Wine added to favorite list
+        400:
+          description: Invalid parameters
+  /deleteFromFavList:
+    post:
+      summary: Remove wine from favorite list
+      parameters:
+        - name: user_id
+          in: query
+          description: User ID
+          required: true
+          type: integer
+        - name: wine_id
+          in: query
+          description: Wine ID
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Wine removed from favorite list
+        400:
+          description: Invalid parameters
+  /newUser:
+    post:
+      summary: Create a new user
+      parameters:
+        - name: username
+          in: query
+          description: Username
+          required: true
           type: string
-        type:
-          type: string
-        description:
-          type: string
-        imageURL:
-          type: string
-        volume:
-          type: number
-          format: float
-        volAlc:
-          type: number
-          format: float
-        isLiked:
-          type: boolean
-        dryness:
-          type: number
-          format: float
-        acidity:
-          type: number
-          format: float
-        tanninLevel:
-          type: number
-          format: float
-        flavours:
-          type: array
-          items:
-            type: string
-        fitsTo:
-          type: array
-          items:
-            type: string
-        supermarkets:
-          type: array
-          items:
+      responses:
+        200:
+          description: User created
+          schema:
             type: object
             properties:
-              name:
+              id:
+                type: integer
+              username:
                 type: string
-              street:
-                type: string
-              postal_code:
-                type: string
-              city:
-                type: string
-              house_number:
-                type: string
-              price:
-                type: number
-                format: float
+        400:
+          description: Invalid parameters
+  /updateUser:
+    post:
+      summary: Update a user
+      parameters:
+        - name: id
+          in: query
+          description: User ID
+          required: true
+          type: integer
+        - name: username
+          in: query
+          description: Username
+          required: true
+          type: string
+      responses:
+        200:
+          description: User updated
+        400:
+          description: Invalid parameters
+  /addWine:
+    post:
+      summary: Add a new wine
+      parameters:
+        - name: name
+          in: query
+          description: Wine name
+          required: true
+          type: string
+        - name: year
+          in: query
+          description: Wine year
+          required: true
+          type: integer
+        - name: country
+          in: query
+          description: Wine country
+          required: true
+          type: string
+        - name: type
+          in: query
+          description: Wine type
+          required: true
+          type: string
+        - name: description
+          in: query
+          description: Wine description
+          required: true
+          type: string
+        - name: imageURL
+          in: query
+          description: Image URL
+          required: false
+          type: string
+        - name: volume
+          in: query
+          description: Wine volume
+          required: true
+          type: number
+          format: float
+        - name: volAlc
+          in: query
+          description: Alcohol volume
+          required: true
+          type: number
+          format: float
+        - name: dryness
+          in: query
+          description: Dryness level
+          required: true
+          type: number
+          format: float
+        - name: acidity
+          in: query
+          description: Acidity level
+          required: true
+          type: number
+          format: float
+        - name: tanninLevel
+          in: query
+          description: Tannin level
+          required: true
+          type: number
+          format: float
+      responses:
+        200:
+          description: Wine added
+        400:
+          description: Invalid parameters
+      security:
+        - Bearer: []
+  /setWineFlavour:
+    post:
+      summary: Set wine flavour
+      parameters:
+        - name: wine_id
+          in: query
+          description: Wine ID
+          required: true
+          type: integer
+        - name: flavour1
+          in: query
+          description: Flavour ID 1
+          required: true
+          type: integer
+        - name: flavour2
+          in: query
+          description: Flavour ID 2
+          required: false
+          type: integer
+        - name: flavour3
+          in: query
+          description: Flavour ID 3
+          required: false
+          type: integer
+      responses:
+        200:
+          description: Wine flavour set
+        400:
+          description: Invalid parameters
+      security:
+        - Bearer: []
+  /setWineFit:
+    post:
+      summary: Set wine fit
+      parameters:
+        - name: wine_id
+          in: query
+          description: Wine ID
+          required: true
+          type: integer
+        - name: fitsTo1
+          in: query
+          description: FitsTo ID 1
+          required: true
+          type: integer
+        - name: fitsTo2
+          in: query
+          description: FitsTo ID 2
+          required: false
+          type: integer
+        - name: fitsTo3
+          in: query
+          description: FitsTo ID 3
+          required: false
+          type: integer
+      responses:
+        200:
+          description: Wine fit set
+        400:
+          description: Invalid parameters
+      security:
+        - Bearer: []
+  /addFlavour:
+    post:
+      summary: Add a new flavour
+      parameters:
+        - name: flavour
+          in: query
+          description: Flavour name
+          required: true
+          type: string
+      responses:
+        200:
+          description: Flavour added
+        400:
+          description: Invalid parameters
+      security:
+        - Bearer: []
+  /addFitsTo:
+    post:
+      summary: Add a new FitsTo
+      parameters:
+        - name: fit_id
+          in: query
+          description: FitsTo name
+          required: true
+          type: string
+      responses:
+        200:
+          description: FitsTo added
+        400:
+          description: Invalid parameters
+      security:
+        - Bearer: []
+  /addSupermarket:
+    post:
+      summary: Add a new supermarket
+      parameters:
+        - name: name
+          in: query
+          description: Supermarket name
+          required: true
+          type: string
+        - name: street
+          in: query
+          description: Supermarket street
+          required: true
+          type: string
+        - name: postal_code
+          in: query
+          description: Supermarket postal code
+          required: true
+          type: string
+        - name: city
+          in: query
+          description: Supermarket city
+          required: true
+          type: string
+        - name: houseNumber
+          in: query
+          description: House number
+          required: true
+          type: string
+      responses:
+        200:
+          description: Supermarket added
+        400:
+          description: Invalid parameters
+      security:
+        - Bearer: []
+  /setWineSupermarket:
+    post:
+      summary: Set wine supermarket price
+      parameters:
+        - name: wine_id
+          in: query
+          description: Wine ID
+          required: true
+          type: integer
+        - name: supermarket_id
+          in: query
+          description: Supermarket ID
+          required: true
+          type: integer
+        - name: price
+          in: query
+          description: Price
+          required: true
+          type: number
+          format: float
+      responses:
+        200:
+          description: Wine supermarket price set
+        400:
+          description: Invalid parameters
+      security:
+        - Bearer: []
+definitions:
+  Wine:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      year:
+        type: integer
+      volume:
+        type: number
+        format: float
+      imageURL:
+        type: string
+      cheapestPrice:
+        type: number
+        format: float
+  FullWine:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      year:
+        type: integer
+      country:
+        type: string
+      type:
+        type: string
+      description:
+        type: string
+      imageURL:
+        type: string
+      volume:
+        type: number
+        format: float
+      volAlc:
+        type: number
+        format: float
+      isLiked:
+        type: boolean
+      dryness:
+        type: number
+        format: float
+      acidity:
+        type: number
+        format: float
+      tanninLevel:
+        type: number
+        format: float
+      flavours:
+        type: array
+        items:
+          type: string
+      fitsTo:
+        type: array
+        items:
+          type: string
+      supermarkets:
+        type: array
+        items:
+          $ref: '#/definitions/Supermarket'
+  Supermarket:
+    type: object
+    properties:
+      name:
+        type: string
+      street:
+        type: string
+      postal_code:
+        type: string
+      city:
+        type: string
+      house_number:
+        type: string
+      price:
+        type: number
+        format: float
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header

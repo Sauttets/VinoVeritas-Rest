@@ -5,15 +5,18 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func FilterWine(c *gin.Context) {
+func GetWines(c *gin.Context) {
 	color := c.Query("color")
 	fit := c.Query("fit")
 	flavour := c.Query("flavour")
-	price := c.Query("price")
+	sort := c.Query("sort")
+	rangeStr := c.Query("range")
+	favList := c.Query("favlist")
 	userID, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
@@ -41,13 +44,15 @@ func FilterWine(c *gin.Context) {
 		Wine.volAlc, 
 		Wine.dryness, 
 		Wine.acidity, 
-		Wine.tanninLevel
+		Wine.tanninLevel,
+		COUNT(DISTINCT FavoriteWines.user_id) as likeCount
 	FROM Wine 
 	LEFT JOIN WineSupermarkets ON Wine.id = WineSupermarkets.wine_id 
 	LEFT JOIN Wine_Flavour ON Wine.id = Wine_Flavour.wine_id
 	LEFT JOIN Flavour ON Wine_Flavour.flavour_id_1 = Flavour.id OR Wine_Flavour.flavour_id_2 = Flavour.id OR Wine_Flavour.flavour_id_3 = Flavour.id
 	LEFT JOIN Wine_FitsTo ON Wine.id = Wine_FitsTo.wine_id
 	LEFT JOIN FitsTo ON Wine_FitsTo.fitsTo_id_1 = FitsTo.id OR Wine_FitsTo.fitsTo_id_2 = FitsTo.id OR Wine_FitsTo.fitsTo_id_3 = FitsTo.id
+	LEFT JOIN FavoriteWines ON Wine.id = FavoriteWines.wine_id
 	`
 
 	var filters []string
@@ -64,6 +69,11 @@ func FilterWine(c *gin.Context) {
 		filters = append(filters, "Flavour.name = '"+flavour+"'")
 	}
 
+	// Filter by user's favorite list
+	if favList == "true" {
+		filters = append(filters, "FavoriteWines.user_id = "+strconv.Itoa(userID))
+	}
+
 	// Add filters to query
 	if len(filters) > 0 {
 		query += " WHERE " + filters[0]
@@ -74,12 +84,31 @@ func FilterWine(c *gin.Context) {
 
 	query += " GROUP BY Wine.id"
 
-	// Sort by price
-	orderBy := " ORDER BY MIN(WineSupermarkets.price) ASC"
-	if price == "1" {
+	// Sort by specified criteria
+	orderBy := " ORDER BY Wine.id ASC"
+	if sort == "low-high" {
+		orderBy = " ORDER BY MIN(WineSupermarkets.price) ASC"
+	} else if sort == "high-low" {
 		orderBy = " ORDER BY MIN(WineSupermarkets.price) DESC"
+	} else if sort == "most-liked" {
+		orderBy = " ORDER BY likeCount DESC"
 	}
 	query += orderBy
+
+	// Add limit and offset for pagination
+	if rangeStr != "" {
+		rangeParts := strings.Split(rangeStr, ":")
+		if len(rangeParts) == 2 {
+			start, err := strconv.Atoi(rangeParts[0])
+			if err == nil {
+				limit, err := strconv.Atoi(rangeParts[1])
+				if err == nil {
+					offset := start - 1
+					query += " LIMIT " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(offset)
+				}
+			}
+		}
+	}
 
 	// Execute the query
 	rows, err := db.Query(query)
@@ -94,7 +123,7 @@ func FilterWine(c *gin.Context) {
 
 	for rows.Next() {
 		var wine FullWine
-		err = rows.Scan(&wine.ID, &wine.Name, &wine.Year, &wine.Country, &wine.Type, &wine.Description, &wine.ImageURL, &wine.Volume, &wine.VolAlc, &wine.Dryness, &wine.Acidity, &wine.TanninLevel)
+		err = rows.Scan(&wine.ID, &wine.Name, &wine.Year, &wine.Country, &wine.Type, &wine.Description, &wine.ImageURL, &wine.Volume, &wine.VolAlc, &wine.Dryness, &wine.Acidity, &wine.TanninLevel, &wine.LikeCount)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -187,4 +216,34 @@ func FilterWine(c *gin.Context) {
 
 	// Return the response
 	c.JSON(http.StatusOK, wines)
+}
+
+// FullWine struct
+type FullWine struct {
+	ID           int           `json:"id"`
+	Name         string        `json:"name"`
+	Year         int           `json:"year"`
+	Country      string        `json:"country"`
+	Type         string        `json:"type"`
+	Description  string        `json:"description"`
+	ImageURL     string        `json:"imageURL"`
+	Volume       float64       `json:"volume"`
+	VolAlc       float64       `json:"volAlc"`
+	IsLiked      bool          `json:"isLiked"`
+	LikeCount    int           `json:"likeCount"`
+	Dryness      float64       `json:"dryness"`
+	Acidity      float64       `json:"acidity"`
+	TanninLevel  float64       `json:"tanninLevel"`
+	Flavours     []string      `json:"flavours"`
+	FitsTo       []string      `json:"fitsTo"`
+	Supermarkets []Supermarket `json:"supermarkets"`
+}
+
+type Supermarket struct {
+	Name        string  `json:"name"`
+	Street      string  `json:"street"`
+	PostalCode  string  `json:"postal_code"`
+	City        string  `json:"city"`
+	HouseNumber string  `json:"house_number"`
+	Price       float64 `json:"price"`
 }
